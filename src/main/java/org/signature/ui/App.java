@@ -32,6 +32,10 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
+    public static Stage getStage() {
+        return (Stage) scene.getWindow();
+    }
+
     public static void main(String[] args) {
         launch();
     }
