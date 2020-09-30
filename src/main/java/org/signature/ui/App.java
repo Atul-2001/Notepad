@@ -20,6 +20,8 @@ public class App extends Application {
         scene = new Scene(loadFXML("TextPad"));
         stage.setScene(scene);
         stage.setTitle("Untitled - Notepad");
+        stage.setMinWidth(900.0);
+        stage.setMinHeight(400.0);
         stage.show();
     }
 

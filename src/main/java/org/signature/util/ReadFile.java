@@ -20,7 +20,7 @@ public class ReadFile extends Task<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    protected synchronized Void call() throws Exception {
         if (source != null && Files.exists(source.toPath())) {
             if (source.isFile()) {
                 if (source.canRead()) {
@@ -28,7 +28,7 @@ public class ReadFile extends Task<Void> {
                         updateMessage("Getting ready...");
                         try (BufferedReader reader = new BufferedReader(new FileReader(source.getAbsolutePath()))) {
 
-                            //clear the text
+                            //clear the textArea
                             writingPad.setText("");
 
                             int workDone = 0;
@@ -65,35 +65,45 @@ public class ReadFile extends Task<Void> {
                             writingPad.setText(data.toString());
                             writingPad.setCaretPosition(0);
                             updateProgress(workDone, totalWork);
-                            updateMessage("Done!");
                             System.gc();
                             System.runFinalization();
-                        } catch (IOException ignored) {
-
+                        } catch (IOException e) {
+                            System.out.println(e.getMessage());
+                            failed();
                         }
                     } else {
                         System.out.println("File is loo large.");
+                        failed();
                     }
                 } else {
                     System.out.println("Can't read file.");
+                    failed();
                 }
             } else {
                 System.out.println("Is a directory.");
+                failed();
             }
         } else {
             System.out.println("Is null");
+            failed();
         }
         return null;
     }
 
     @Override
-    protected void cancelled() {
+    protected synchronized void succeeded() {
+        super.succeeded();
+        updateMessage("Done!");
+    }
+
+    @Override
+    protected synchronized void cancelled() {
         super.cancelled();
         updateMessage("Cancelled!");
     }
 
     @Override
-    protected void failed() {
+    protected synchronized void failed() {
         super.failed();
         updateMessage("Failed!");
     }

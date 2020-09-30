@@ -23,7 +23,7 @@ public class WriteFile extends Service<Boolean> {
     protected Task<Boolean> createTask() {
         return new Task<>() {
             @Override
-            protected Boolean call() throws Exception {
+            protected synchronized Boolean call() throws Exception {
                 if (destination != null) {
                     destination.createNewFile();
                     if (destination.isFile()) {
@@ -47,31 +47,40 @@ public class WriteFile extends Service<Boolean> {
                                     off += len;
                                     len = Math.min(totalSize - len, len);
                                 } while (off < totalSize);
-                                updateMessage("Done!");
                                 return true;
                             } catch (IOException e) {
                                 System.out.println(e.getMessage());
+                                failed();
                             }
                         } else {
                             System.out.println("Can't Write");
+                            failed();
                         }
                     } else {
                         System.out.println("Is not a file");
+                        failed();
                     }
                 } else {
                     System.out.println("Is null");
+                    failed();
                 }
                 return false;
             }
 
             @Override
-            protected void cancelled() {
+            protected synchronized void succeeded() {
+                super.succeeded();
+                updateMessage("Done!");
+            }
+
+            @Override
+            protected synchronized void cancelled() {
                 super.cancelled();
                 updateMessage("Cancelled!");
             }
 
             @Override
-            protected void failed() {
+            protected synchronized void failed() {
                 super.failed();
                 updateMessage("Failed!");
             }

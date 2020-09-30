@@ -1,7 +1,10 @@
 package org.signature.ui;
 
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingNode;
@@ -10,7 +13,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -22,9 +29,13 @@ import org.signature.util.ReadFile;
 import org.signature.util.WriteFile;
 
 import javax.swing.*;
-import java.io.*;
+import java.awt.*;
+import java.awt.print.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
+import java.util.concurrent.Executors;
 
 public class TextPadController {
 
@@ -44,6 +55,10 @@ public class TextPadController {
     private CheckMenuItem showStatusBar;
     @FXML
     private ProgressBar progressBar;
+    @FXML
+    private Label progressMsg;
+
+
     private final JTextArea writingPad = new JTextArea();
 
     private TextFile textFile;
@@ -52,6 +67,7 @@ public class TextPadController {
     private final StringProperty windowTitle = new SimpleStringProperty("Untitled");
     private final BooleanProperty isEdited = new SimpleBooleanProperty(false);
     private boolean isNewFile;
+    private final PrinterJob printerJob = PrinterJob.getPrinterJob();
 
     public void initialize() {
         textFile = new TextFile(DEFAULT_FILE_LOCATION, DEFAULT_FILENAME, DEFAULT_FILE_EXTENSION);
@@ -88,7 +104,10 @@ public class TextPadController {
                 isEdited.set(true);
             }
         }
+    }
 
+    @FXML
+    public void handleEditEvent2(KeyEvent keyEvent) {
         if (keyEvent.isControlDown() && keyEvent.getCode().equals(KeyCode.X)) {
             if (!isEdited.get()) {
                 isEdited.set(true);
@@ -156,6 +175,8 @@ public class TextPadController {
             isNewFile = false;
 
             Task<Void> readTask = new ReadFile(writingPad, source);
+            progressMsg.visibleProperty().bind(readTask.runningProperty());
+            progressMsg.textProperty().bind(readTask.messageProperty());
             progressBar.visibleProperty().bind(readTask.runningProperty());
             progressBar.progressProperty().bind(readTask.progressProperty());
             Thread readThread = new Thread(readTask);
@@ -187,7 +208,7 @@ public class TextPadController {
 
         if (isNewFile) {
             FileChooser saveFileDialog = new FileChooser();
-            saveFileDialog.setTitle("Save File");
+            saveFileDialog.setTitle("Save");
             saveFileDialog.setInitialDirectory(new File(DEFAULT_FILE_LOCATION));
             saveFileDialog.setInitialFileName(DEFAULT_FILENAME + "." + DEFAULT_FILE_EXTENSION);
             saveFileDialog.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Text", "*.txt"),
@@ -197,6 +218,8 @@ public class TextPadController {
 
         if (destination != null) {
             Service<Boolean> writeToFileService = new WriteFile(writingPad, destination);
+            progressMsg.visibleProperty().bind(writeToFileService.runningProperty());
+            progressMsg.textProperty().bind(writeToFileService.messageProperty());
             progressBar.visibleProperty().bind(writeToFileService.runningProperty());
             progressBar.progressProperty().bind(writeToFileService.progressProperty());
 
@@ -230,10 +253,162 @@ public class TextPadController {
 
             writeToFileService.setOnFailed(event -> writeToFileService.restart());
 
+            writeToFileService.setExecutor(Executors.newSingleThreadExecutor());
             writeToFileService.start();
             return true;
         } else {
             return false;
+        }
+    }
+
+    @FXML
+    public void handleSaveAs(ActionEvent actionEvent) {
+        FileChooser saveFileDialog = new FileChooser();
+        saveFileDialog.setTitle("Save As");
+        saveFileDialog.setInitialDirectory(new File(textFile.getFilepath()));
+        saveFileDialog.setInitialFileName(textFile.getFilename() + "." + textFile.getFileExtension());
+        saveFileDialog.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Text", "*.txt"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+        File destination = saveFileDialog.showSaveDialog(window);
+
+        if (destination != null) {
+            Service<Boolean> writeToFileService = new WriteFile(writingPad, destination);
+            progressMsg.visibleProperty().bind(writeToFileService.runningProperty());
+            progressMsg.textProperty().bind(writeToFileService.messageProperty());
+            progressBar.visibleProperty().bind(writeToFileService.runningProperty());
+            progressBar.progressProperty().bind(writeToFileService.progressProperty());
+
+            writeToFileService.setOnSucceeded(event -> {
+                if (writeToFileService.getValue()) {
+                    if (!Files.exists(destination.toPath())) {
+                        Alert saveFailedAlert = new Alert(Alert.AlertType.ERROR);
+                        saveFailedAlert.setTitle("Save failed!");
+                        saveFailedAlert.setContentText("Failed to save the file. Would you like to try again!");
+                        ButtonType tryAgain = new ButtonType("Try Again");
+                        ButtonType dontSave = new ButtonType("Don't Save");
+                        saveFailedAlert.getButtonTypes().setAll(tryAgain, dontSave, ButtonType.CANCEL);
+                        Optional<ButtonType> result = saveFailedAlert.showAndWait();
+
+                        if (result.isPresent() && result.get().equals(tryAgain)) {
+                            writeToFileService.restart();
+                        } else if (result.isPresent() && result.get().equals(dontSave)) {
+                            System.out.println("File not saved");
+                        } else if (result.isPresent()) {
+                            return;
+                        }
+                    }
+
+                    textFile = new TextFile(destination);
+                    windowTitle.set(destination.getName());
+                    isEdited.set(false);
+                    isNewFile = false;
+                }
+            });
+
+            writeToFileService.setOnFailed(event -> writeToFileService.restart());
+
+            writeToFileService.setExecutor(Executors.newSingleThreadExecutor());
+            writeToFileService.start();
+        }
+    }
+
+    private void printerExceptionMsg(String title, String msg) {
+        Alert noPrinterAlert = new Alert(Alert.AlertType.INFORMATION);
+        noPrinterAlert.setTitle(title);
+        noPrinterAlert.setContentText(msg);
+        noPrinterAlert.showAndWait();
+    }
+
+    @FXML
+    public void handlePageSetup(ActionEvent actionEvent) {
+        try {
+            printerJob.defaultPage(printerJob.pageDialog(new PageFormat()));
+        } catch (Exception exception) {
+            String message;
+            if (exception.getMessage() != null) {
+                if (exception.getMessage().isEmpty()) {
+                    message = "Error occurred! Please try again!";
+                } else {
+                    message = exception.getMessage();
+                }
+            } else {
+                message = "Error occurred! Please try again!";
+            }
+            printerExceptionMsg("Page Setup", message);
+        }
+    }
+
+    @FXML
+    public void handlePagePrinting(ActionEvent actionEvent) {
+        Task<Void> printTasK = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    updateMessage("Getting things ready...");
+                    printerJob.setPrintable(writingPad.getPrintable(null, null));
+                    if (printerJob.printDialog()) {
+                        updateMessage("Printing...");
+                        printerJob.print();
+                    } else {
+                        cancelled();
+                    }
+                } catch (PrinterException | NullPointerException exception) {
+                    String message = "Error occurred! Please try again\n" + exception.getMessage();
+                    printerExceptionMsg("Print", message);
+                    this.failed();
+                }
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                super.succeeded();
+                updateMessage("Done!");
+            }
+
+            @Override
+            protected void cancelled() {
+                super.cancelled();
+                updateMessage("Cancelled!");
+            }
+
+            @Override
+            protected void failed() {
+                super.failed();
+                updateMessage("Failed!");
+            }
+        };
+
+        progressMsg.visibleProperty().bind(printTasK.runningProperty());
+        progressMsg.textProperty().bind(printTasK.messageProperty());
+        progressBar.visibleProperty().bind(printTasK.runningProperty());
+        progressBar.progressProperty().bind(printTasK.progressProperty());
+
+        new Thread(printTasK).start();
+    }
+
+    @FXML
+    public void handleExit(ActionEvent actionEvent) {
+        if (isEdited.get()) {
+            Alert fileEditedAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            fileEditedAlert.setContentText("Do you want to save the changes to " + windowTitle.get() + "?");
+            ButtonType save = new ButtonType("Save");
+            ButtonType dontSave = new ButtonType("Don't Save");
+            fileEditedAlert.getButtonTypes().setAll(save, dontSave, ButtonType.CANCEL);
+            Optional<ButtonType> result = fileEditedAlert.showAndWait();
+            //button - Save, Don't Save, Cancel
+
+            if (result.isPresent() && result.get().equals(save)) {
+                if (handleSaveFile(null)) {
+                    Platform.exit();
+                }
+            } else if (result.isPresent() && result.get().equals(dontSave)) {
+                Platform.exit();
+            }/* else if (result.isPresent() && result.get().equals(ButtonType.CANCEL)) {
+                return;
+            }*/
+        } else {
+            Platform.exit();
         }
     }
 
