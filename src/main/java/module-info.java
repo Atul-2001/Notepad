@@ -6,4 +6,5 @@ module org.example {
 
     opens org.signature.ui to javafx.fxml;
     exports org.signature.ui;
+    exports org.signature.model;
 }

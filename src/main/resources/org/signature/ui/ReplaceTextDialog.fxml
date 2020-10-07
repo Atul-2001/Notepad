@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<DialogPane fx:id="dialog" prefHeight="222.0" prefWidth="660.0" xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.signature.ui.ReplaceTextDialogController">
+    <content>
+        <AnchorPane minHeight="200.0" prefHeight="200.0" prefWidth="660.0">
+            <children>
+                <Label layoutX="14.0" layoutY="21.0" text="Find what:">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="searchField" layoutX="142.0" layoutY="16.0" prefHeight="28.0" prefWidth="340.0">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </TextField>
+                <Label layoutX="14.0" layoutY="60.0" text="Replace with:">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </Label>
+                <TextField fx:id="replaceableTextField" layoutX="142.0" layoutY="54.0" prefHeight="28.0"
+                           prefWidth="340.0">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </TextField>
+                <CheckBox fx:id="matchCase" layoutX="16.0" layoutY="135.0" mnemonicParsing="false" prefHeight="20.0"
+                          prefWidth="105.0" text="Match case">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </CheckBox>
+                <CheckBox fx:id="wrapAround" layoutX="15.0" layoutY="169.0" mnemonicParsing="false" prefHeight="20.0"
+                          prefWidth="105.0" text="Wrap around">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </CheckBox>
+                <Button fx:id="findButton" disable="true" layoutX="525.0" layoutY="16.0" mnemonicParsing="false"
+                        onAction="#handleFind" prefHeight="28.0" prefWidth="100.0" text="Find Next">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </Button>
+                <Button fx:id="replaceButton" disable="true" layoutX="525.0" layoutY="54.0" mnemonicParsing="false"
+                        onAction="#handleReplace" prefHeight="28.0" prefWidth="100.0" text="Replace">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </Button>
+                <Button fx:id="replaceAllButton" disable="true" layoutX="525.0" layoutY="92.0" mnemonicParsing="false"
+                        onAction="#handleReplaceAll" prefHeight="28.0" prefWidth="100.0" text="Replace All">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </Button>
+                <Button cancelButton="true" layoutX="525.0" layoutY="130.0" mnemonicParsing="false"
+                        onAction="#handleCancel" prefHeight="28.0" prefWidth="100.0" text="Cancel">
+                    <font>
+                        <Font name="Roboto" size="14.0"/>
+                    </font>
+                </Button>
+            </children>
+        </AnchorPane>
+    </content>
+</DialogPane>

@@ -72,39 +72,41 @@ public class ReadFile extends Task<Void> {
                             failed();
                         }
                     } else {
+                        updateMessage("File is loo large.");
                         System.out.println("File is loo large.");
-                        failed();
+                        cancel(true);
                     }
                 } else {
+                    updateMessage("Can't read file.");
                     System.out.println("Can't read file.");
-                    failed();
+                    cancel(true);
                 }
             } else {
                 System.out.println("Is a directory.");
-                failed();
+                cancel(true);
             }
         } else {
             System.out.println("Is null");
-            failed();
+            cancel(true);
         }
         return null;
     }
 
     @Override
     protected synchronized void succeeded() {
-        super.succeeded();
         updateMessage("Done!");
+        super.succeeded();
     }
 
     @Override
     protected synchronized void cancelled() {
-        super.cancelled();
         updateMessage("Cancelled!");
+        super.cancelled();
     }
 
     @Override
     protected synchronized void failed() {
-        super.failed();
         updateMessage("Failed!");
+        super.failed();
     }
 }

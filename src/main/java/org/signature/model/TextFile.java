@@ -14,7 +14,7 @@ public final class TextFile {
 
     public TextFile(String filepath, String filename, String fileExtension) {
         if (filepath == null || filename == null || fileExtension == null) {
-            throw new NullPointerException("All fields are required.");
+            throw new NullPointerException("All fields are required. @Not NULL");
         } else {
             this.filepath = optimizePath(filepath);
             this.filename = filename;

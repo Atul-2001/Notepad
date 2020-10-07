@@ -30,59 +30,46 @@ public class WriteFile extends Service<Boolean> {
                         if (destination.canWrite()) {
                             updateMessage("Getting ready...");
                             try (BufferedWriter writer = new BufferedWriter(new FileWriter(destination.getAbsolutePath()))) {
-                                char[] buffer = writingPad.getText().toCharArray();
-                                int off = 0, len;
-                                int totalSize = buffer.length;
-
-                                if (totalSize / 1024 <= 64) {
-                                    len = totalSize;
-                                } else {
-                                    len = 64 * 1024;
-                                }
-
                                 updateMessage("Saving file...");
-                                do {
-                                    writer.write(buffer, off, len);
-                                    updateProgress(len, totalSize);
-                                    off += len;
-                                    len = Math.min(totalSize - len, len);
-                                } while (off < totalSize);
+                                writer.write(writingPad.getText());
+//                                Files.write(destination.toPath(), writingPad.getText().getBytes(), StandardOpenOption.WRITE);
                                 return true;
                             } catch (IOException e) {
-                                System.out.println(e.getMessage());
+                                System.out.println("Exception : " + e.getMessage());
                                 failed();
                             }
                         } else {
+                            updateMessage("Can't write");
                             System.out.println("Can't Write");
-                            failed();
+                            cancel(true);
                         }
                     } else {
                         System.out.println("Is not a file");
-                        failed();
+                        cancel(true);
                     }
                 } else {
                     System.out.println("Is null");
-                    failed();
+                    cancel(true);
                 }
                 return false;
             }
 
             @Override
             protected synchronized void succeeded() {
-                super.succeeded();
                 updateMessage("Done!");
+                super.succeeded();
             }
 
             @Override
             protected synchronized void cancelled() {
-                super.cancelled();
                 updateMessage("Cancelled!");
+                super.cancelled();
             }
 
             @Override
             protected synchronized void failed() {
-                super.failed();
                 updateMessage("Failed!");
+                super.failed();
             }
         };
     }
