@@ -148,11 +148,11 @@ public class TextPadController {
     private void createSwingTextArea(final SwingNode swingNode) {
         SwingUtilities.invokeLater(() -> {
             JScrollPane scrollPane = new JScrollPane(writingPad,
-                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             undoRedoManager.setLimit(Integer.MAX_VALUE);
             writingPad.getDocument().addUndoableEditListener(undoRedoManager);
-            writingPad.setFont(new Font("System", Font.PLAIN, 12));
+            writingPad.setFont(new Font("Roboto", Font.PLAIN, 14));
             writingPad.setSelectionColor(new Color(72, 133, 237));
             writingPad.setSelectedTextColor(Color.WHITE);
 
@@ -265,6 +265,11 @@ public class TextPadController {
             return true;
         }
     }
+
+    /*
+    * All Functionality of File Menu
+    *
+    *  */
 
     @FXML
     public void handleNewFile(ActionEvent event) {
@@ -524,6 +529,11 @@ public class TextPadController {
         window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
+    /*
+    *
+    * Functionality of Edit Menu
+    * */
+
     @FXML
     public void handleUndo(ActionEvent actionEvent) {
         try {
@@ -694,6 +704,24 @@ public class TextPadController {
     }
 
     @FXML
+    public void handleStatusBar(ActionEvent event) {
+        if (showStatusBar.isSelected()) {
+            root.setBottom(statusBar);
+        } else {
+            root.setBottom(null);
+        }
+    }
+
+    protected static Map<String, Boolean> getPreviousStatus() {
+        return previousStatusOfFindDialog;
+    }
+
+    /*
+    *
+    * Functionality of Format Menu
+    * */
+
+    @FXML
     public void handleWordWrap(ActionEvent actionEvent) {
         SwingUtilities.invokeLater(() -> {
             if (wordWrap.isSelected()) {
@@ -707,15 +735,17 @@ public class TextPadController {
     }
 
     @FXML
-    public void handleStatusBar(ActionEvent event) {
-        if (showStatusBar.isSelected()) {
-            root.setBottom(statusBar);
-        } else {
-            root.setBottom(null);
+    public void handleFont(ActionEvent actionEvent) {
+        Dialog<Void> fontDialog = new Dialog<>();
+        fontDialog.initOwner(window);
+        fontDialog.setTitle("Font");
+        try {
+            FontDialogController.setSource(writingPad);
+            fontDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("FontDialog.fxml")));
+        } catch (IOException e) {
+            System.out.println("File \"FontDialog.fxml\" not found!");
         }
-    }
-
-    protected static Map<String, Boolean> getPreviousStatus() {
-        return previousStatusOfFindDialog;
+        fontDialog.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> fontDialog.close());
+        fontDialog.showAndWait();
     }
 }

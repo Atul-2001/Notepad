@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<DialogPane fx:id="dialog" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.signature.ui.FontDialogController">
+   <content>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="578.0" prefWidth="600.0">
+         <children>
+            <Label layoutX="29.0" layoutY="17.0" prefHeight="20.0" prefWidth="216.0" text="Font :">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="fontName" layoutX="28.0" layoutY="39.0" prefHeight="26.0" prefWidth="216.0" promptText="Font">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </TextField>
+            <ListView fx:id="fontNameList" layoutX="28.0" layoutY="69.0" prefHeight="212.0" prefWidth="216.0" />
+            <Label layoutX="288.0" layoutY="17.0" prefHeight="20.0" prefWidth="170.0" text=" Font style :">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="fontStyle" layoutX="288.0" layoutY="39.0" prefHeight="26.0" prefWidth="170.0" promptText="Font style">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </TextField>
+            <ListView fx:id="fontStyleList" layoutX="288.0" layoutY="69.0" prefHeight="212.0" prefWidth="170.0" />
+            <Label layoutX="501.0" layoutY="17.0" prefHeight="20.0" prefWidth="68.0" text="Size :">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="fontSize" layoutX="501.0" layoutY="39.0" prefHeight="26.0" prefWidth="68.0" promptText="Size">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </TextField>
+            <ListView fx:id="fontSizeList" layoutX="501.0" layoutY="69.0" prefHeight="212.0" prefWidth="68.0" />
+            <Label layoutX="31.0" layoutY="305.0" text="Sample :">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </Label>
+            <Pane layoutX="30.0" layoutY="333.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="540.0" style="-fx-border-color: LIGHTGRAY;">
+               <children>
+                  <Label fx:id="sampleText" layoutX="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="520.0" text="The quick brown fox jumps over the lazy dog">
+                     <font>
+                        <Font name="Roboto" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+            <Button cancelButton="true" layoutX="508.0" layoutY="520.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleCancelButton" prefHeight="28.0" prefWidth="64.0" text="Cancel">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="ok" defaultButton="true" layoutX="429.0" layoutY="520.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleOkButton" prefHeight="28.0" prefWidth="64.0" text="OK">
+               <font>
+                  <Font name="Roboto" size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+   </content>
+</DialogPane>
