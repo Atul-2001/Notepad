@@ -11,7 +11,7 @@
     <top>
         <MenuBar maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="900.0" BorderPane.alignment="CENTER">
             <menus>
-                <Menu text="File">
+                <Menu mnemonicParsing="false" text="File">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleNewFile" text="New">
                             <accelerator>
@@ -48,9 +48,6 @@
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
                     </items>
-               <accelerator>
-                  <KeyCodeCombination alt="DOWN" code="F" control="UP" meta="UP" shift="UP" shortcut="UP" />
-               </accelerator>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
                     <items>
@@ -134,17 +131,17 @@
                     <items>
                         <Menu mnemonicParsing="false" text="Zoom">
                             <items>
-                                <MenuItem mnemonicParsing="false" text="Zoom In">
+                                <MenuItem mnemonicParsing="false" onAction="#handleZoomIn" text="Zoom In">
                                     <accelerator>
-                                        <KeyCodeCombination alt="UP" code="PLUS" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                                        <KeyCodeCombination alt="UP" code="EQUALS" control="DOWN" meta="UP" shift="ANY" shortcut="UP" />
                                     </accelerator>
                                 </MenuItem>
-                                <MenuItem mnemonicParsing="false" text="Zoom Out">
+                                <MenuItem mnemonicParsing="false" onAction="#handleZoomOut" text="Zoom Out">
                                     <accelerator>
                                         <KeyCodeCombination alt="UP" code="MINUS" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                                     </accelerator>
                                 </MenuItem>
-                                <MenuItem mnemonicParsing="false" text="Restore Default Zoom">
+                                <MenuItem mnemonicParsing="false" onAction="#handleRestoreDefaultZoom" text="Restore Default Zoom">
                                     <accelerator>
                                         <KeyCodeCombination alt="UP" code="DIGIT0" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                                     </accelerator>
@@ -182,7 +179,7 @@
                         <Font name="Roboto" size="14.0" />
                     </font>
                 </Label>
-                <Label fx:id="zoom" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="80.0" text="100%">
+                <Label fx:id="zoomIndicator" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="80.0" text="100%">
                     <font>
                         <Font name="Roboto" size="14.0" />
                     </font>

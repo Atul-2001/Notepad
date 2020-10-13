@@ -1,10 +1,7 @@
 package org.signature.ui;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingNode;
@@ -27,6 +24,7 @@ import org.signature.model.TextFile;
 import org.signature.util.ReadFile;
 import org.signature.util.ResultIterator;
 import org.signature.util.WriteFile;
+import org.signature.util.Zoom;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -77,6 +75,8 @@ public class TextPadController {
     private ProgressBar progressBar;
     @FXML
     private Label progressMsg;
+    @FXML
+    private Label zoomIndicator;
 
 
     private final JTextArea writingPad = new JTextArea();
@@ -89,9 +89,12 @@ public class TextPadController {
     private final StringProperty windowTitle = new SimpleStringProperty("Untitled");
     private final BooleanProperty isEdited = new SimpleBooleanProperty(false);
     private boolean isNewFile, isOpenedFile = false;
+
     private final PrinterJob printerJob = PrinterJob.getPrinterJob();
     private final Clipboard clipboard = Clipboard.getSystemClipboard();
+
     private final ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
+    private final IntegerProperty zoomLevel = new SimpleIntegerProperty(100);
 
     public void initialize() {
         textFile = new TextFile(DEFAULT_FILE_LOCATION, DEFAULT_FILENAME, DEFAULT_FILE_EXTENSION);
@@ -112,6 +115,10 @@ public class TextPadController {
                     isEdited.set(false);
                 }
             }
+        });
+
+        zoomLevel.addListener((observable, oldValue, newValue) -> {
+            zoomIndicator.setText(newValue.intValue() + "%");
         });
 
         Platform.runLater(() -> {
@@ -143,6 +150,8 @@ public class TextPadController {
             searchG.setDisable(!isTextSelected);
         };
         scheduledService.scheduleWithFixedDelay(command, 1, 1, TimeUnit.SECONDS);
+
+        Zoom.setControls(writingPad, zoomLevel);
     }
 
     private void createSwingTextArea(final SwingNode swingNode) {
@@ -200,10 +209,12 @@ public class TextPadController {
                 }
 
                 @Override
-                public void keyPressed(KeyEvent keyEvent) {}
+                public void keyPressed(KeyEvent keyEvent) {
+                }
 
                 @Override
-                public void keyReleased(KeyEvent keyEvent) {}
+                public void keyReleased(KeyEvent keyEvent) {
+                }
             });
 
             writingPad.getDocument().addDocumentListener(new DocumentListener() {
@@ -233,7 +244,8 @@ public class TextPadController {
                 }
 
                 @Override
-                public void changedUpdate(DocumentEvent e) {}
+                public void changedUpdate(DocumentEvent e) {
+                }
             });
 
             swingNode.setContent(scrollPane);
@@ -267,9 +279,9 @@ public class TextPadController {
     }
 
     /*
-    * All Functionality of File Menu
-    *
-    *  */
+     * All Functionality of File Menu
+     *
+     *  */
 
     @FXML
     public void handleNewFile(ActionEvent event) {
@@ -530,22 +542,24 @@ public class TextPadController {
     }
 
     /*
-    *
-    * Functionality of Edit Menu
-    * */
+     *
+     * Functionality of Edit Menu
+     * */
 
     @FXML
     public void handleUndo(ActionEvent actionEvent) {
         try {
             undoRedoManager.undo();
-        } catch (CannotUndoException ignored) {}
+        } catch (CannotUndoException ignored) {
+        }
     }
 
     @FXML
     public void handleRedo(ActionEvent actionEvent) {
         try {
             undoRedoManager.redo();
-        } catch (CannotRedoException ignored) {}
+        } catch (CannotRedoException ignored) {
+        }
     }
 
     @FXML
@@ -703,23 +717,14 @@ public class TextPadController {
         isEdited.set(true);
     }
 
-    @FXML
-    public void handleStatusBar(ActionEvent event) {
-        if (showStatusBar.isSelected()) {
-            root.setBottom(statusBar);
-        } else {
-            root.setBottom(null);
-        }
-    }
-
     protected static Map<String, Boolean> getPreviousStatus() {
         return previousStatusOfFindDialog;
     }
 
     /*
-    *
-    * Functionality of Format Menu
-    * */
+     *
+     * Functionality of Format Menu
+     * */
 
     @FXML
     public void handleWordWrap(ActionEvent actionEvent) {
@@ -747,5 +752,34 @@ public class TextPadController {
         }
         fontDialog.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> fontDialog.close());
         fontDialog.showAndWait();
+    }
+
+    /*
+     *
+     * View Menu
+     * */
+
+    @FXML
+    public void handleZoomIn(ActionEvent actionEvent) {
+        Zoom.in();
+    }
+
+    @FXML
+    public void handleZoomOut(ActionEvent actionEvent) {
+        Zoom.out();
+    }
+
+    @FXML
+    public void handleRestoreDefaultZoom(ActionEvent actionEvent) {
+        Zoom.restore();
+    }
+
+    @FXML
+    public void handleStatusBar(ActionEvent event) {
+        if (showStatusBar.isSelected()) {
+            root.setBottom(statusBar);
+        } else {
+            root.setBottom(null);
+        }
     }
 }

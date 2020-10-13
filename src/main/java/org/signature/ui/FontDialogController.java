@@ -8,15 +8,18 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import org.signature.util.Zoom;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.util.Locale;
 
 public class FontDialogController {
@@ -41,9 +44,11 @@ public class FontDialogController {
     private Button ok;
 
     private static JTextArea writingPad;
+    private static AffineTransform currentZoomLevel;
 
     public void initialize() {
         java.awt.Font currentFont = writingPad.getFont();
+        currentZoomLevel = Zoom.getTransform();
         String currentFontStyle = "";
         switch (currentFont.getStyle()) {
             case java.awt.Font.PLAIN:
@@ -67,6 +72,15 @@ public class FontDialogController {
         fontNameList.setItems(FXCollections.observableArrayList(graphicsEnvironment.getAvailableFontFamilyNames(Locale.US)));
         fontStyleList.setItems(FXCollections.observableArrayList("Regular", "Italic", "Bold", "Bold italic"));
         fontSizeList.setItems(FXCollections.observableArrayList("8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"));
+
+        fontSize.setOnKeyPressed(event -> fontSize.setEditable((event.getCode().isDigitKey() && !event.isShiftDown()) ||
+                (event.getCode().equals(KeyCode.MINUS) && !event.isShiftDown()) ||
+                event.getCode().equals(KeyCode.SUBTRACT) ||
+                event.getCode().equals(KeyCode.BACK_SPACE) ||
+                event.getCode().equals(KeyCode.DELETE) ||
+                event.getCode().isNavigationKey() ||
+                event.getCode().equals(KeyCode.ENTER)
+                /* event.getText().matches("[[^\\-]&&\\p{Punct}]")*/));
 
         fontNameList.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
             @Override
@@ -166,11 +180,16 @@ public class FontDialogController {
 
     private void setSampleTextFont(String family, String style, String size) {
         if (size.isEmpty()) {
-            size = "0";
+            size = "0.0";
         }
+
+        if (size.contains("-")) {
+            size = "1.0";
+        }
+
         double newSize = Double.parseDouble(size);
         if (newSize < 0.0) {
-            newSize = -newSize;
+            newSize = 1.0;
         }
         switch (style) {
             case "Regular":
@@ -203,7 +222,7 @@ public class FontDialogController {
         }
 
         if (fontSize.textProperty().isEmpty().get()) {
-            showMessageAlert("This is not a valid size.\nChoose a size from the list of sizes or any size above 0.");
+            showMessageAlert("This is not a valid size.\nChoose a size from the list of sizes\nor any size greater than 0.");
             return;
         }
 
@@ -219,23 +238,36 @@ public class FontDialogController {
             return;
         }
 
-        int FontSize = Integer.parseInt(fontSize.getText());
+        String size = fontSize.getText();
+        if (size.isEmpty()) {
+            size = "0.0";
+        }
+
+        if (size.contains("-")) {
+            size = "1.0";
+        }
+
+        int FontSize = Integer.parseInt(size);
         if (FontSize < 0) {
-            FontSize = -FontSize;
+            FontSize = 1;
         }
 
         switch (FontStyle) {
             case "Regular":
                 writingPad.setFont(new java.awt.Font(fontFamily, java.awt.Font.PLAIN, FontSize));
+                writingPad.setFont(writingPad.getFont().deriveFont(currentZoomLevel));
                 break;
             case "Italic":
                 writingPad.setFont(new java.awt.Font(fontFamily, java.awt.Font.ITALIC, FontSize));
+                writingPad.setFont(writingPad.getFont().deriveFont(currentZoomLevel));
                 break;
             case "Bold":
                 writingPad.setFont(new java.awt.Font(fontFamily, java.awt.Font.BOLD, FontSize));
+                writingPad.setFont(writingPad.getFont().deriveFont(currentZoomLevel));
                 break;
             case "Bold italic":
                 writingPad.setFont(new java.awt.Font(fontFamily, java.awt.Font.BOLD + java.awt.Font.ITALIC, FontSize));
+                writingPad.setFont(writingPad.getFont().deriveFont(currentZoomLevel));
                 break;
         }
 
@@ -258,7 +290,7 @@ public class FontDialogController {
     }
 
     public static void setSource(JTextArea textArea) {
-        writingPad = textArea;
+        FontDialogController.writingPad = textArea;
     }
 
 }
