@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ public class App extends Application {
         stage.setTitle("Untitled - Notepad");
         stage.setMinWidth(900.0);
         stage.setMinHeight(400.0);
+        stage.getIcons().add(new Image(getClass().getResource("/icons/notepad-icon.png").toString()));
         stage.show();
     }
 

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+
+<DialogPane fx:id="dialog" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.signature.ui.FeedbackController">
+   <content>
+      <AnchorPane style="-fx-background-color: TRANSPARENT;">
+         <children>
+            <GridPane alignment="TOP_CENTER" hgap="10.0" prefHeight="340.0" prefWidth="600.0" vgap="20.0">
+              <columnConstraints>
+                <ColumnConstraints maxWidth="100.0" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints fillWidth="false" maxWidth="500.0" minWidth="10.0" prefWidth="500.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                  <RowConstraints minHeight="10.0" prefHeight="180.0" />
+              </rowConstraints>
+               <children>
+                  <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="58.0" text="Name :" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto" size="18.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="nameField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="460.0" GridPane.columnIndex="1">
+                     <font>
+                        <Font name="Roboto" size="14.0" />
+                     </font>
+                  </TextField>
+                  <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="64.0" text=" E-mail :" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto" size="18.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="emailField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="460.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="Roboto" size="14.0" />
+                     </font>
+                  </TextField>
+                  <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="62.0" text="Rating :" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                     <font>
+                        <Font name="Roboto" size="18.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="240.0" spacing="16.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <children>
+                        <SVGPath fx:id="r1" content="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z" fill="WHITE" scaleX="2.0" scaleY="2.0" stroke="BLACK" strokeWidth="0.4" />
+                        <SVGPath fx:id="r2" content="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z" fill="WHITE" scaleX="2.0" scaleY="2.0" stroke="BLACK" strokeWidth="0.4" />
+                        <SVGPath fx:id="r3" content="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z" fill="WHITE" scaleX="2.0" scaleY="2.0" stroke="BLACK" strokeWidth="0.4" />
+                        <SVGPath fx:id="r4" content="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z" fill="WHITE" scaleX="2.0" scaleY="2.0" stroke="BLACK" strokeWidth="0.4" />
+                        <SVGPath fx:id="r5" content="M9 11.3l3.71 2.7-1.42-4.36L15 7h-4.55L9 2.5 7.55 7H3l3.71 2.64L5.29 14z" fill="WHITE" scaleX="2.0" scaleY="2.0" stroke="BLACK" strokeWidth="0.4" />
+                        <Label fx:id="reset" text="Reset" textFill="#4885ed" underline="true" visible="false">
+                           <font>
+                              <Font name="Roboto" size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets left="26.0" />
+                           </HBox.margin></Label>
+                     </children>
+                     <padding>
+                        <Insets left="14.0" />
+                     </padding>
+                  </HBox>
+                  <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="72.0" text=" Review :" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP">
+                     <font>
+                        <Font name="Roboto" size="18.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets top="2.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <TextArea fx:id="reviewField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="180.0" prefWidth="460.0" promptText="Write your review..." GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="Roboto" size="16.0" />
+                     </font>
+                  </TextArea>
+               </children>
+               <padding>
+                  <Insets top="6.0" />
+               </padding>
+            </GridPane>
+            <ButtonBar layoutX="362.0" layoutY="358.0" prefHeight="40.0" prefWidth="200.0">
+              <buttons>
+                <Button fx:id="submit" defaultButton="true" mnemonicParsing="false" onAction="#handleSubmit" text="Submit" />
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+              </buttons>
+            </ButtonBar>
+         </children>
+      </AnchorPane>
+   </content>
+   <header>
+      <Label alignment="CENTER" prefHeight="60.0" prefWidth="640.0" text="Submit your review">
+         <font>
+            <Font name="Roboto Bold Italic" size="40.0" />
+         </font>
+      </Label>
+   </header>
+</DialogPane>

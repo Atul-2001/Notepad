@@ -11,7 +11,7 @@
     <top>
         <MenuBar maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="900.0" BorderPane.alignment="CENTER">
             <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu text="File">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleNewFile" text="New">
                             <accelerator>
@@ -49,7 +49,7 @@
                         <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
+                <Menu text="Edit">
                     <items>
                         <MenuItem fx:id="undo" disable="true" mnemonicParsing="false" onAction="#handleUndo" text="Undo">
                             <accelerator>
@@ -103,7 +103,7 @@
                                 <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                             </accelerator>
                         </MenuItem>
-                        <MenuItem disable="true" mnemonicParsing="false" text="Go To...">
+                        <MenuItem fx:id="goTo" mnemonicParsing="false" onAction="#handleGoToLine" text="Go To...">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                             </accelerator>
@@ -121,13 +121,13 @@
                         </MenuItem>
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Format">
+                <Menu text="Format">
                     <items>
                         <CheckMenuItem fx:id="wordWrap" mnemonicParsing="false" onAction="#handleWordWrap" text="Word Wrap" />
                         <MenuItem mnemonicParsing="false" onAction="#handleFont" text="Font..." />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="View">
+                <Menu text="View">
                     <items>
                         <Menu mnemonicParsing="false" text="Zoom">
                             <items>
@@ -151,12 +151,12 @@
                         <CheckMenuItem fx:id="showStatusBar" mnemonicParsing="false" onAction="#handleStatusBar" text="Status Bar" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu text="Help">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="View Help" />
-                        <MenuItem mnemonicParsing="false" text="Send Feedback" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleHelpPage" text="View Help" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleSendFeedback" text="Send Feedback" />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="About Notepad" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleAboutPage" text="About Notepad" />
                     </items>
                 </Menu>
             </menus>
@@ -165,7 +165,7 @@
     <bottom>
         <HBox fx:id="statusBar" alignment="CENTER_RIGHT" minHeight="-Infinity" prefHeight="20.0" prefWidth="900.0" BorderPane.alignment="CENTER">
             <children>
-                <Label fx:id="progressMsg" alignment="CENTER_RIGHT" minWidth="140.0" prefHeight="12.0" text="Getting things ready..." visible="false" HBox.hgrow="SOMETIMES">
+                <Label fx:id="progressMsg" alignment="CENTER_RIGHT" minWidth="140.0" prefHeight="12.0" visible="false" HBox.hgrow="SOMETIMES">
                     <padding>
                         <Insets right="4" />
                     </padding>
@@ -174,7 +174,7 @@
                     </font>
                 </Label>
                 <ProgressBar fx:id="progressBar" prefHeight="12.0" prefWidth="200.0" progress="0.0" visible="false" HBox.hgrow="NEVER" />
-                <Label fx:id="caretPosition" alignment="CENTER" prefHeight="20.0" prefWidth="160.0" text="Ln 1, Col 1">
+                <Label fx:id="caretPositionIndicator" alignment="CENTER" prefHeight="20.0" prefWidth="160.0" text="Ln 1, Col 1">
                     <font>
                         <Font name="Roboto" size="14.0" />
                     </font>
@@ -184,12 +184,12 @@
                         <Font name="Roboto" size="14.0" />
                     </font>
                 </Label>
-                <Label fx:id="formattingType" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="160.0" text="Window (CRLF)">
+                <Label fx:id="eolFormatIndicator" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="160.0">
                     <font>
                         <Font name="Roboto" size="14.0" />
                     </font>
                 </Label>
-                <Label fx:id="encodingType" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="80.0" text="UTF - 8">
+                <Label alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="80.0" text="UTF - 8">
                     <font>
                         <Font name="Roboto" size="14.0" />
                     </font>

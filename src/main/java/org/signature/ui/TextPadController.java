@@ -14,7 +14,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -29,6 +31,7 @@ import org.signature.util.Zoom;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
@@ -66,7 +69,7 @@ public class TextPadController {
     @FXML
     private HBox statusBar;
     @FXML
-    MenuItem undo, cut, copy, paste, delete, find, findNext, findPrevious, replace, searchG;
+    MenuItem undo, cut, copy, paste, delete, find, findNext, findPrevious, replace, searchG, goTo;
     @FXML
     private CheckMenuItem wordWrap;
     @FXML
@@ -76,7 +79,11 @@ public class TextPadController {
     @FXML
     private Label progressMsg;
     @FXML
+    private Label caretPositionIndicator;
+    @FXML
     private Label zoomIndicator;
+    @FXML
+    private Label eolFormatIndicator;
 
 
     private final JTextArea writingPad = new JTextArea();
@@ -94,7 +101,9 @@ public class TextPadController {
     private final Clipboard clipboard = Clipboard.getSystemClipboard();
 
     private final ScheduledExecutorService scheduledService = Executors.newSingleThreadScheduledExecutor();
+    private final StringProperty caretPosition = new SimpleStringProperty();
     private final IntegerProperty zoomLevel = new SimpleIntegerProperty(100);
+    private final StringProperty EndOfLine = new SimpleStringProperty();
 
     public void initialize() {
         textFile = new TextFile(DEFAULT_FILE_LOCATION, DEFAULT_FILENAME, DEFAULT_FILE_EXTENSION);
@@ -109,17 +118,13 @@ public class TextPadController {
             } else {
                 window.setTitle(windowTitle.get() + " - Notepad");
             }
-
-            if (writingPad.getText().isEmpty()) {
-                if (isNewFile) {
-                    isEdited.set(false);
-                }
-            }
         });
 
-        zoomLevel.addListener((observable, oldValue, newValue) -> {
-            zoomIndicator.setText(newValue.intValue() + "%");
-        });
+        undo.disableProperty().bind(isEdited.not());
+
+        caretPosition.addListener((observable, oldValue, newValue) -> caretPositionIndicator.setText(newValue));
+        zoomLevel.addListener((observable, oldValue, newValue) -> zoomIndicator.setText(newValue.intValue() + "%"));
+        EndOfLine.addListener((observable, oldValue, newValue) -> eolFormatIndicator.setText(newValue));
 
         Platform.runLater(() -> {
             window = App.getStage();
@@ -134,7 +139,6 @@ public class TextPadController {
         });
 
         Runnable command = () -> {
-            undo.setDisable(!isEdited.get());
             Platform.runLater(() -> paste.setDisable(!clipboard.hasString()));
 
             boolean isTextPadEmpty = writingPad.getText().isEmpty();
@@ -143,6 +147,7 @@ public class TextPadController {
             findPrevious.setDisable(isTextPadEmpty);
             replace.setDisable(isTextPadEmpty);
             delete.setDisable(isTextPadEmpty);
+            goTo.setDisable(isTextPadEmpty);
 
             boolean isTextSelected = (writingPad.getSelectedText() != null);
             cut.setDisable(!isTextSelected);
@@ -150,15 +155,27 @@ public class TextPadController {
             searchG.setDisable(!isTextSelected);
         };
         scheduledService.scheduleWithFixedDelay(command, 1, 1, TimeUnit.SECONDS);
-
         Zoom.setControls(writingPad, zoomLevel);
+
+        caretPosition.set("Ln 1, Col 1");
+        zoomLevel.set(100);
+        String os = System.getProperty("os.name");
+        if (os.contains("Windows") || os.contains("windows")) {
+            EndOfLine.set(TextFile.EOLFormat.WINDOW);
+        } else if (os.contains("Linux") || os.contains("linux")) {
+            EndOfLine.set(TextFile.EOLFormat.LINUX);
+        } else if (os.contains("Mac") || os.contains("mac") || os.contains("Unix") || os.contains("unix")) {
+            EndOfLine.set(TextFile.EOLFormat.UNIX_MACOS);
+        }
+
+        showStatusBar.setSelected(true);
     }
 
     private void createSwingTextArea(final SwingNode swingNode) {
         SwingUtilities.invokeLater(() -> {
             JScrollPane scrollPane = new JScrollPane(writingPad,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             undoRedoManager.setLimit(Integer.MAX_VALUE);
             writingPad.getDocument().addUndoableEditListener(undoRedoManager);
             writingPad.setFont(new Font("Roboto", Font.PLAIN, 14));
@@ -248,6 +265,15 @@ public class TextPadController {
                 }
             });
 
+            writingPad.addCaretListener(event -> {
+                int caretPos = event.getDot();
+                try {
+                    int row = writingPad.getLineOfOffset(caretPos);
+                    int column = caretPos - writingPad.getLineStartOffset(row);
+                    Platform.runLater(() -> caretPosition.set("Ln " + (row + 1) + ", Col " + (column + 1)));
+                } catch (BadLocationException ignored) {}
+            });
+
             swingNode.setContent(scrollPane);
         });
     }
@@ -286,11 +312,12 @@ public class TextPadController {
     @FXML
     public void handleNewFile(ActionEvent event) {
         if (saveIfFileEdited()) {
+            isNewFile = true;
+            writingPad.setCaretPosition(0);
             writingPad.setText("");
             textFile = new TextFile(DEFAULT_FILE_LOCATION, DEFAULT_FILENAME, DEFAULT_FILE_EXTENSION);
             windowTitle.set(DEFAULT_FILENAME);
             isEdited.set(false);
-            isNewFile = true;
         }
     }
 
@@ -311,7 +338,7 @@ public class TextPadController {
                 isNewFile = false;
                 isOpenedFile = true;
 
-                Task<Void> readTask = new ReadFile(writingPad, source);
+                Task<Void> readTask = new ReadFile(writingPad, source, EndOfLine);
                 progressMsg.visibleProperty().bind(readTask.runningProperty());
                 progressMsg.textProperty().bind(readTask.messageProperty());
                 progressBar.visibleProperty().bind(readTask.runningProperty());
@@ -323,9 +350,21 @@ public class TextPadController {
                     return thread;
                 });
 
-                readTask.setOnSucceeded(event -> service.shutdown());
-                readTask.setOnFailed(event -> service.shutdown());
-                readTask.setOnCancelled(event -> service.shutdown());
+                readTask.setOnSucceeded(event -> {
+                    service.shutdown();
+                    isOpenedFile = true;
+                    isEdited.set(false);
+                });
+                readTask.setOnFailed(event -> {
+                    service.shutdown();
+                    isOpenedFile = true;
+                    isEdited.set(false);
+                });
+                readTask.setOnCancelled(event -> {
+                    service.shutdown();
+                    isOpenedFile = true;
+                    isEdited.set(false);
+                });
 
                 service.execute(readTask);
             }
@@ -356,7 +395,7 @@ public class TextPadController {
         } else {
             File destination = textFile.toFile();
 
-            Service<Boolean> writeToFileService = new WriteFile(writingPad, destination);
+            Service<Boolean> writeToFileService = new WriteFile(writingPad, destination, EndOfLine);
             ExecutorService service = Executors.newFixedThreadPool(2);
             writeToFileService.setExecutor(service);
 
@@ -413,7 +452,7 @@ public class TextPadController {
         File destination = saveFileDialog.showSaveDialog(window);
 
         if (destination != null) {
-            Service<Boolean> writeToFileService = new WriteFile(writingPad, destination);
+            Service<Boolean> writeToFileService = new WriteFile(writingPad, destination, EndOfLine);
             ExecutorService service = Executors.newFixedThreadPool(2);
             writeToFileService.setExecutor(service);
 
@@ -590,7 +629,9 @@ public class TextPadController {
             } catch (IllegalArgumentException ignored) {
             }
         } else {
+            int selectionStart = writingPad.getSelectionStart();
             writingPad.replaceSelection("");
+            writingPad.setCaretPosition(selectionStart);
         }
     }
 
@@ -666,6 +707,7 @@ public class TextPadController {
             findTextDialog.getDialogPane().setContent(loader.load());
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            return;
         }
         FindTextDialogController controller = loader.getController();
         controller.setSource(writingPad);
@@ -697,11 +739,49 @@ public class TextPadController {
             replaceTextDialog.getDialogPane().setContent(loader.load());
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            return;
         }
         ReplaceTextDialogController controller = loader.getController();
         controller.setSource(writingPad);
         replaceTextDialog.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> replaceTextDialog.close());
         replaceTextDialog.showAndWait();
+    }
+
+    @FXML
+    public void handleGoToLine(ActionEvent actionEvent) {
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.initOwner(window);
+        inputDialog.setTitle("Go To");
+        inputDialog.setHeaderText(null);
+        inputDialog.setContentText("Enter line number : ");
+        TextField lineNumberField = inputDialog.getEditor();
+        lineNumberField.setOnKeyPressed(event -> lineNumberField.setEditable(event.getCode().isDigitKey() ||
+                event.getCode().isNavigationKey() ||
+                event.getCode().equals(KeyCode.BACK_SPACE) ||
+                event.getCode().equals(KeyCode.DELETE)));
+
+        Optional<String> result = inputDialog.showAndWait();
+        if (result.isPresent()) {
+            String value = result.get();
+            if (!value.isEmpty()) {
+                int lineNumber = Integer.parseInt(value);
+                if (lineNumber <= 0) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Go To");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Invalid line no : " + lineNumber);
+                    alert.showAndWait();
+                } else {
+                    try {
+                        int caretPosition = writingPad.getLineStartOffset(lineNumber-1);
+                        writingPad.setCaretPosition(caretPosition);
+                        writingPad.setSelectionStart(caretPosition);
+                        writingPad.setSelectionEnd(writingPad.getLineEndOffset(lineNumber-1));
+//                        writingPad.setCaretPosition(caretPosition);
+                    } catch (BadLocationException ignored) {}
+                }
+            }
+        }
     }
 
     @FXML
@@ -749,6 +829,7 @@ public class TextPadController {
             fontDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("FontDialog.fxml")));
         } catch (IOException e) {
             System.out.println("File \"FontDialog.fxml\" not found!");
+            return;
         }
         fontDialog.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> fontDialog.close());
         fontDialog.showAndWait();
@@ -782,4 +863,55 @@ public class TextPadController {
             root.setBottom(null);
         }
     }
+
+    /*
+    *
+    * Help Menu
+    * */
+
+    @FXML
+    public void handleHelpPage(ActionEvent actionEvent) {
+        Dialog<ButtonType> helpDialog = new Dialog<>();
+        helpDialog.initOwner(window);
+        helpDialog.setTitle("Notepad - Help");
+        try {
+            helpDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("Help.fxml")));
+        } catch (IOException e) {
+            System.out.println("Failed to load Help window " + e.getMessage());
+            return;
+        }
+        helpDialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        helpDialog.showAndWait();
+    }
+
+    @FXML
+    public void handleSendFeedback(ActionEvent actionEvent) {
+        Dialog<Void> feedbackDialog = new Dialog<>();
+        feedbackDialog.initOwner(window);
+        feedbackDialog.setTitle("Notepad - Feedback");
+        try {
+            feedbackDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("Feedback.fxml")));
+        } catch (IOException e) {
+            System.out.println("Failed to load Feedback window " + e.getMessage());
+            return;
+        }
+        feedbackDialog.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> feedbackDialog.close());
+        feedbackDialog.showAndWait();
+    }
+
+    @FXML
+    public void handleAboutPage(ActionEvent actionEvent) {
+        Dialog<ButtonType> aboutDialog = new Dialog<>();
+        aboutDialog.initOwner(window);
+        aboutDialog.setTitle("Notepad - About");
+        try {
+            aboutDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("About.fxml")));
+        } catch (IOException e) {
+            System.out.println("Failed to load About window " + e.getMessage());
+            return;
+        }
+        aboutDialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        aboutDialog.showAndWait();
+    }
+
 }

@@ -1,11 +1,13 @@
 package org.signature.util;
 
+import javafx.application.Platform;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
+import org.signature.model.TextFile;
 
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -13,10 +15,14 @@ public class ReadFile extends Task<Void> {
 
     private final JTextArea writingPad;
     private final File source;
+    private final StringProperty EndOfLine;
+    private String EOL_Type;
 
-    public ReadFile(JTextArea writingPad, File source) {
+    public ReadFile(JTextArea writingPad, File source, StringProperty formattingType) {
         this.writingPad = writingPad;
         this.source = source;
+        this.EndOfLine = formattingType;
+        EOL_Type = EndOfLine.get();
     }
 
     @Override
@@ -26,8 +32,7 @@ public class ReadFile extends Task<Void> {
                 if (source.canRead()) {
                     if ((source.length() / (1024 * 1024)) <= 10) {
                         updateMessage("Getting ready...");
-                        try (BufferedReader reader = new BufferedReader(new FileReader(source.getAbsolutePath()))) {
-
+                        try (BufferedReader reader = Files.newBufferedReader(source.toPath()) /*new BufferedReader(new FileReader(source.getAbsolutePath()))*/) {
                             //clear the textArea
                             writingPad.setText("");
 
@@ -51,18 +56,32 @@ public class ReadFile extends Task<Void> {
                             }
 
                             int read;
-                            StringBuilder data = new StringBuilder();
-
                             updateMessage("Reading " + source.getName() + "...");
                             while ((read = reader.read(buffer)) >= 0) {
-                                data.append(buffer, 0, read);
+
+                                String value = new String(buffer, 0, read);
+
+                                if (value.contains("\r\n")) {
+                                    EOL_Type = TextFile.EOLFormat.WINDOW;
+                                } else if (value.contains("\r")) {
+                                    EOL_Type = TextFile.EOLFormat.CLASSIC_MACOS;
+                                } else if (value.contains("\n")) {
+                                    String os = System.getProperty("os.name");
+                                    if (os.contains("Linux") || os.contains("linux")) {
+                                        EOL_Type = TextFile.EOLFormat.LINUX;
+                                    } else if (os.contains("Mac") || os.contains("mac") || os.contains("Unix") || os.contains("unix")) {
+                                        EOL_Type = TextFile.EOLFormat.UNIX_MACOS;
+                                    }
+                                }
+
+                                writingPad.append(value);
                                 workDone += read;
                                 updateProgress(workDone, totalWork);
                             }
 
                             updateMessage("Please wait...");
                             workDone += 1;
-                            writingPad.setText(data.toString());
+                            Platform.runLater(() -> EndOfLine.set(EOL_Type));
                             writingPad.setCaretPosition(0);
                             updateProgress(workDone, totalWork);
                             System.gc();

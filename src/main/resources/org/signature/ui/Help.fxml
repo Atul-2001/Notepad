@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<DialogPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" style="-fx-background-color: WHITE;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.signature.ui.HelpController">
+   <content>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: WHITE;">
+         <children>
+            <Label layoutX="190.8" layoutY="44.8" prefHeight="54.0" prefWidth="244.0" style="-fx-background-color: TRANSPARENT;" text="Notepad" AnchorPane.leftAnchor="180.0" AnchorPane.rightAnchor="180.0" AnchorPane.topAnchor="12.0">
+               <graphic>
+                  <ImageView fitHeight="54.0" fitWidth="56.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../../icons/notepad-icon.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <font>
+                  <Font name="Roboto Bold Italic" size="42.0" />
+               </font>
+            </Label>
+            <Separator layoutY="144.0" prefHeight="4.0" prefWidth="640.0" AnchorPane.topAnchor="72.0" />
+            <Label layoutX="14.0" layoutY="110.0" text="Help -&gt; Shortcuts">
+               <font>
+                  <Font name="Roboto Bold" size="24.0" />
+               </font>
+            </Label>
+            <TableView fx:id="help" focusTraversable="false" layoutX="14.0" layoutY="153.0" prefHeight="306.0" prefWidth="612.0">
+              <columns>
+                 <TableColumn editable="false" minWidth="-Infinity" prefWidth="305.0" resizable="false" sortable="false" style="-fx-background-color: WHITE; -fx-border-color: BLACK" text="Command" >
+                    <cellValueFactory>
+                       <PropertyValueFactory property="command"/>
+                    </cellValueFactory>
+                 </TableColumn>
+                 <TableColumn editable="false" minWidth="-Infinity" prefWidth="305.0" resizable="false" sortable="false" style="-fx-background-color: WHITE; -fx-border-color: BLACK" text="Shortcut" >
+                    <cellValueFactory>
+                       <PropertyValueFactory property="keyValue"/>
+                    </cellValueFactory>
+                 </TableColumn>
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </children>
+      </AnchorPane>
+   </content>
+</DialogPane>

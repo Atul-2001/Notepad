@@ -87,4 +87,11 @@ public final class TextFile {
     public String toString() {
         return filename + "." + fileExtension;
     }
+
+    public static final class EOLFormat {
+        public static final String WINDOW = "Window (CRLF)";
+        public static final String LINUX = "Linux (LF)";
+        public static final String CLASSIC_MACOS = "Unix (CR)";
+        public static final String UNIX_MACOS = "Unix (LF)";
+    }
 }
