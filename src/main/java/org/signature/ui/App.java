@@ -61,8 +61,8 @@ public class App extends Application {
         scene = new Scene(loadFXML("TextPad"));
         stage.setScene(scene);
         stage.setTitle("Untitled - Notepad");
-        stage.setMinWidth(900.0);
-        stage.setMinHeight(400.0);
+        stage.setMinWidth(640.0);
+        stage.setMinHeight(240.0);
         stage.getIcons().add(new Image(getClass().getResource("/icons/notepad-icon.png").toString()));
         stage.show();
     }

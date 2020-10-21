@@ -30,6 +30,11 @@
             <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>jakarta.activation</artifactId>
+            <version>1.2.2</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -46,6 +51,15 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.4</version>
                 <configuration>
+                    <options>
+                        <option>--add-exports</option>
+                        <option>java.desktop/sun.swing=javafx.swing</option>
+                        <option>--add-exports</option>
+                        <option>java.desktop/sun.awt=javafx.swing</option>
+                    </options>
+                    <release>${maven.compiler.target}</release>
+                    <jlinkImageName>Notepad</jlinkImageName>
+                    <launcher>notepad</launcher>
                     <mainClass>org.signature.ui.App</mainClass>
                 </configuration>
             </plugin>
