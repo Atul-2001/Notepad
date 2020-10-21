@@ -9,7 +9,7 @@
 
 <BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.signature.ui.TextPadController">
     <top>
-        <MenuBar maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+        <MenuBar maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="900.0" BorderPane.alignment="CENTER" style="-fx-background-color: WHITE">
             <menus>
                 <Menu text="File">
                     <items>
@@ -163,9 +163,9 @@
         </MenuBar>
     </top>
     <bottom>
-        <HBox fx:id="statusBar" alignment="CENTER_RIGHT" minHeight="-Infinity" prefHeight="20.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+        <HBox fx:id="statusBar" alignment="CENTER_RIGHT" minHeight="-Infinity" prefHeight="20.0" prefWidth="900.0" BorderPane.alignment="CENTER" style="-fx-background-color: WHITE">
             <children>
-                <Label fx:id="progressMsg" alignment="CENTER_RIGHT" minWidth="140.0" prefHeight="12.0" visible="false" HBox.hgrow="SOMETIMES">
+                <Label fx:id="progressMsg" alignment="CENTER_RIGHT" minWidth="140.0" prefHeight="12.0" visible="false" HBox.hgrow="SOMETIMES" style="-fx-background-color: TRANSPARENT">
                     <padding>
                         <Insets right="4" />
                     </padding>
@@ -173,23 +173,23 @@
                         <Font name="Roboto" size="14.0" />
                     </font>
                 </Label>
-                <ProgressBar fx:id="progressBar" prefHeight="12.0" prefWidth="200.0" progress="0.0" visible="false" HBox.hgrow="NEVER" />
-                <Label fx:id="caretPositionIndicator" alignment="CENTER" prefHeight="20.0" prefWidth="160.0" text="Ln 1, Col 1">
+                <ProgressBar fx:id="progressBar" prefHeight="12.0" prefWidth="200.0" progress="0.0" visible="false" HBox.hgrow="NEVER" style="-fx-background-color: TRANSPARENT" />
+                <Label fx:id="caretPositionIndicator" alignment="CENTER" prefHeight="20.0" prefWidth="160.0" text="Ln 1, Col 1" style="-fx-background-color: TRANSPARENT">
                     <font>
                         <Font name="Roboto" size="14.0" />
                     </font>
                 </Label>
-                <Label fx:id="zoomIndicator" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="80.0" text="100%">
+                <Label fx:id="zoomIndicator" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="80.0" text="100%" style="-fx-background-color: TRANSPARENT">
                     <font>
                         <Font name="Roboto" size="14.0" />
                     </font>
                 </Label>
-                <Label fx:id="eolFormatIndicator" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="160.0">
+                <Label fx:id="eolFormatIndicator" alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="160.0" style="-fx-background-color: TRANSPARENT">
                     <font>
                         <Font name="Roboto" size="14.0" />
                     </font>
                 </Label>
-                <Label alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="80.0" text="UTF - 8">
+                <Label alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="80.0" text="UTF - 8" style="-fx-background-color: TRANSPARENT">
                     <font>
                         <Font name="Roboto" size="14.0" />
                     </font>

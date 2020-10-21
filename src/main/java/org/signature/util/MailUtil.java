@@ -51,6 +51,7 @@ public class MailUtil {
 
             return true;
         } catch (IOException exception) {
+            System.out.println(exception.getLocalizedMessage());
             return false;
         }
     }
@@ -64,7 +65,7 @@ public class MailUtil {
             message.setContent(content, "text/html");
             return message;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.getLocalizedMessage());
         }
         return null;
     }

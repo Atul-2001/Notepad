@@ -7,7 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.awt.*;
+import java.io.*;
 
 /**
  * JavaFX App
@@ -15,6 +16,45 @@ import java.io.IOException;
 public class App extends Application {
 
     private static Scene scene;
+    private static GraphicsEnvironment graphicsEnvironment;
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        try {
+            graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Poppins-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Poppins-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Poppins-Italic.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Poppins-BoldItalic.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Poppins-Thin.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Kalam-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Kalam-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Karma-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Karma-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Galada-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindSiliguri-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindSiliguri-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Farsan-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindVadodara-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindVadodara-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/MuktaVaani-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/MuktaVaani-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Shrikhand-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/MuktaMahee-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/MuktaMahee-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/BalooChettan2-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/BalooChettan2-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/BalooBhaina2-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/BalooBhaina2-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindMadurai-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindMadurai-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindGuntur-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindGuntur-Bold.ttf")));
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -40,7 +80,12 @@ public class App extends Application {
         return (Stage) scene.getWindow();
     }
 
+    public static GraphicsEnvironment getGraphicsEnvironment() {
+        return graphicsEnvironment;
+    }
+
     public static void main(String[] args) {
         launch();
     }
+
 }

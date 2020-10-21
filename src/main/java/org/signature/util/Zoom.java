@@ -62,7 +62,7 @@ public final class Zoom {
             if (zoomValue.doubleValue() == DEFAULT_ZOOM.doubleValue()) {
                 zoomOutResult = new BigDecimal("0.9");
             }
-writingPad.getFont().getTransform();
+
             BigDecimal zoomOut = zoomOutResult.divide(zoomValue, MathContext.DECIMAL32);
             transformTx.scale(zoomOut.doubleValue(), zoomOut.doubleValue());
             writingPad.setFont(writingPad.getFont().deriveFont(transformTx));

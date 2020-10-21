@@ -23,6 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.signature.model.TextFile;
+import org.signature.preferences.UserPreferences;
 import org.signature.util.ReadFile;
 import org.signature.util.ResultIterator;
 import org.signature.util.WriteFile;
@@ -48,9 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -58,7 +57,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TextPadController {
 
-    private final String DEFAULT_FILE_LOCATION = System.getProperty("user.home") + File.separator + "Documents";
+    private String DEFAULT_FILE_LOCATION = UserPreferences.getInstance().get(UserPreferences.Key.FILE_DIRECTORY, UserPreferences.DEFAULT_FILE_DIRECTORY);
     private final String DEFAULT_FILENAME = "Untitled";
     private final String DEFAULT_FILE_EXTENSION = "txt";
 
@@ -90,7 +89,6 @@ public class TextPadController {
     private final UndoManager undoRedoManager = new UndoManager();
 
     private TextFile textFile;
-    private static final Map<String, Boolean> previousStatusOfFindDialog = new HashMap<>(4);
 
     private Stage window;
     private final StringProperty windowTitle = new SimpleStringProperty("Untitled");
@@ -168,7 +166,9 @@ public class TextPadController {
             EndOfLine.set(TextFile.EOLFormat.UNIX_MACOS);
         }
 
-        showStatusBar.setSelected(true);
+        wordWrap.setSelected(UserPreferences.getInstance().getBoolean(UserPreferences.Key.WORD_WRAP, UserPreferences.DEFAULT_WORD_WRAP));
+        showStatusBar.setSelected(UserPreferences.getInstance().getBoolean(UserPreferences.Key.STATUS_BAR, UserPreferences.DEFAULT_SHOW_STATUS_BAR));
+        handleStatusBar(null);
     }
 
     private void createSwingTextArea(final SwingNode swingNode) {
@@ -176,12 +176,14 @@ public class TextPadController {
             JScrollPane scrollPane = new JScrollPane(writingPad,
                     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-            undoRedoManager.setLimit(Integer.MAX_VALUE);
+            writingPad.setLocale(Locale.getDefault());
+            writingPad.setBackground(Color.WHITE);
+            writingPad.setForeground(Color.BLACK);
+            undoRedoManager.setLimit(1_00_000);
             writingPad.getDocument().addUndoableEditListener(undoRedoManager);
-            writingPad.setFont(new Font("Roboto", Font.PLAIN, 14));
+            writingPad.setFont(UserPreferences.getInstance().getFont());
             writingPad.setSelectionColor(new Color(72, 133, 237));
             writingPad.setSelectedTextColor(Color.WHITE);
-
             writingPad.getInputMap().put(KeyStroke.getKeyStroke("ctrl H"), "none");
             writingPad.getInputMap().put(KeyStroke.getKeyStroke("ctrl Z"), "none");
             writingPad.getInputMap().put(KeyStroke.getKeyStroke("ctrl X"), "none");
@@ -194,7 +196,7 @@ public class TextPadController {
                 @Override
                 public void keyTyped(KeyEvent keyEvent) {
                     String keyChar = String.valueOf(keyEvent.getKeyChar());
-                    if (keyChar.matches("(?i)[a-z|0-9|\\p{Punct}|\\s|\\t]") && !keyEvent.isAltDown()) {
+                    if (keyChar.matches("(?i)[a-z|0-9|\\p{Punct}|\\s|\\t]") && !keyEvent.isAltDown() && !keyEvent.isControlDown()) {
                         if (!isEdited.get()) {
                             Platform.runLater(() -> isEdited.set(true));
                         }
@@ -337,6 +339,8 @@ public class TextPadController {
                 isEdited.set(false);
                 isNewFile = false;
                 isOpenedFile = true;
+                DEFAULT_FILE_LOCATION = textFile.getFilepath();
+                UserPreferences.getInstance().set(UserPreferences.Key.FILE_DIRECTORY, textFile.getFilepath());
 
                 Task<Void> readTask = new ReadFile(writingPad, source, EndOfLine);
                 progressMsg.visibleProperty().bind(readTask.runningProperty());
@@ -383,7 +387,7 @@ public class TextPadController {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Notepad");
             alert.setHeaderText(null);
-            alert.setContentText("Failed to open new window!\nPlease try again.");
+            alert.setContentText("Failed to open new window!\nPlease try again. " + e.getLocalizedMessage());
             alert.showAndWait();
         }
     }
@@ -392,7 +396,7 @@ public class TextPadController {
     public void handleSaveFile(ActionEvent actionEvent) {
         if (isNewFile) {
             handleSaveAs(null);
-        } else {
+        } else if (isEdited.get()) {
             File destination = textFile.toFile();
 
             Service<Boolean> writeToFileService = new WriteFile(writingPad, destination, EndOfLine);
@@ -483,6 +487,8 @@ public class TextPadController {
                     }
 
                     textFile = new TextFile(destination);
+                    DEFAULT_FILE_LOCATION = textFile.getFilepath();
+                    UserPreferences.getInstance().set(UserPreferences.Key.FILE_DIRECTORY, textFile.getFilepath());
                     windowTitle.set(destination.getName());
                     isEdited.set(false);
                     isNewFile = false;
@@ -551,19 +557,16 @@ public class TextPadController {
             @Override
             protected void succeeded() {
                 updateMessage("Done!");
-                super.succeeded();
             }
 
             @Override
             protected void cancelled() {
                 updateMessage("Cancelled!");
-                super.cancelled();
             }
 
             @Override
             protected void failed() {
                 updateMessage("Failed!");
-                super.failed();
             }
         };
 
@@ -663,25 +666,21 @@ public class TextPadController {
                     @Override
                     protected void running() {
                         updateMessage("Launching browser...");
-                        super.running();
                     }
 
                     @Override
                     protected void succeeded() {
                         updateMessage("Done!");
-                        super.succeeded();
                     }
 
                     @Override
                     protected void cancelled() {
                         updateMessage("Cancelled!");
-                        super.cancelled();
                     }
 
                     @Override
                     protected void failed() {
                         updateMessage("Failed!");
-                        super.failed();
                     }
                 };
 
@@ -777,7 +776,6 @@ public class TextPadController {
                         writingPad.setCaretPosition(caretPosition);
                         writingPad.setSelectionStart(caretPosition);
                         writingPad.setSelectionEnd(writingPad.getLineEndOffset(lineNumber-1));
-//                        writingPad.setCaretPosition(caretPosition);
                     } catch (BadLocationException ignored) {}
                 }
             }
@@ -797,10 +795,6 @@ public class TextPadController {
         isEdited.set(true);
     }
 
-    protected static Map<String, Boolean> getPreviousStatus() {
-        return previousStatusOfFindDialog;
-    }
-
     /*
      *
      * Functionality of Format Menu
@@ -816,6 +810,7 @@ public class TextPadController {
                 writingPad.setLineWrap(false);
                 writingPad.setWrapStyleWord(false);
             }
+            UserPreferences.getInstance().setBoolean(UserPreferences.Key.WORD_WRAP, wordWrap.isSelected());
         });
     }
 
@@ -828,7 +823,7 @@ public class TextPadController {
             FontDialogController.setSource(writingPad);
             fontDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("FontDialog.fxml")));
         } catch (IOException e) {
-            System.out.println("File \"FontDialog.fxml\" not found!");
+            System.out.println("Failed to load font selection window " + e.getLocalizedMessage());
             return;
         }
         fontDialog.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> fontDialog.close());
@@ -862,6 +857,7 @@ public class TextPadController {
         } else {
             root.setBottom(null);
         }
+        UserPreferences.getInstance().setBoolean(UserPreferences.Key.STATUS_BAR, showStatusBar.isSelected());
     }
 
     /*
@@ -877,7 +873,7 @@ public class TextPadController {
         try {
             helpDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("Help.fxml")));
         } catch (IOException e) {
-            System.out.println("Failed to load Help window " + e.getMessage());
+            System.out.println("Failed to load Help window " + e.getLocalizedMessage());
             return;
         }
         helpDialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
@@ -892,7 +888,7 @@ public class TextPadController {
         try {
             feedbackDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("Feedback.fxml")));
         } catch (IOException e) {
-            System.out.println("Failed to load Feedback window " + e.getMessage());
+            System.out.println("Failed to load Feedback window " + e.getLocalizedMessage());
             return;
         }
         feedbackDialog.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> feedbackDialog.close());
@@ -907,7 +903,7 @@ public class TextPadController {
         try {
             aboutDialog.getDialogPane().setContent(FXMLLoader.load(getClass().getResource("About.fxml")));
         } catch (IOException e) {
-            System.out.println("Failed to load About window " + e.getMessage());
+            System.out.println("Failed to load About window " + e.getLocalizedMessage());
             return;
         }
         aboutDialog.getDialogPane().getButtonTypes().add(ButtonType.OK);

@@ -15,6 +15,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import org.signature.preferences.UserPreferences;
 import org.signature.util.Zoom;
 
 import javax.swing.*;
@@ -68,7 +69,7 @@ public class FontDialogController {
         fontStyleList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         fontSizeList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsEnvironment graphicsEnvironment = App.getGraphicsEnvironment();
         fontNameList.setItems(FXCollections.observableArrayList(graphicsEnvironment.getAvailableFontFamilyNames(Locale.US)));
         fontStyleList.setItems(FXCollections.observableArrayList("Regular", "Italic", "Bold", "Bold italic"));
         fontSizeList.setItems(FXCollections.observableArrayList("8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"));
@@ -131,7 +132,7 @@ public class FontDialogController {
             }
         });
 
-        fontName.setText(currentFont.getFontName());
+        fontName.setText(currentFont.getFamily());
         fontStyle.setText(currentFontStyle);
         fontSize.setText(String.valueOf(currentFont.getSize()));
 
@@ -168,10 +169,10 @@ public class FontDialogController {
 
         String finalCurrentFontStyle = currentFontStyle;
         Platform.runLater(() -> {
-            fontNameList.getSelectionModel().select(currentFont.getFontName());
+            fontNameList.getSelectionModel().select(currentFont.getFamily());
             fontStyleList.getSelectionModel().select(finalCurrentFontStyle);
             fontSizeList.getSelectionModel().select(String.valueOf(currentFont.getSize()));
-            fontNameList.scrollTo(currentFont.getFontName());
+            fontNameList.scrollTo(currentFont.getFamily());
             fontSizeList.scrollTo(String.valueOf(currentFont.getSize()));
             setSampleTextFont(currentFont.getFontName(), finalCurrentFontStyle, String.valueOf(currentFont.getSize()));
             ok.requestFocus();
@@ -271,6 +272,7 @@ public class FontDialogController {
                 break;
         }
 
+        UserPreferences.getInstance().setFont(writingPad.getFont());
         handleCancelButton(null);
     }
 

@@ -5,11 +5,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+import org.signature.preferences.UserPreferences;
 import org.signature.util.MatcherResultList;
 import org.signature.util.ResultIterator;
 
 import javax.swing.*;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,19 +27,11 @@ public class ReplaceTextDialogController {
 
     private JTextArea writingPad;
     private final AtomicBoolean isChanged = new AtomicBoolean(false);
-    private static Map<String, Boolean> previousStatus;
 
     public void initialize() {
-        previousStatus = TextPadController.getPreviousStatus();
-        if (previousStatus.isEmpty()) {
-            previousStatus.put(matchCase.getText(), false);
-            previousStatus.put(wrapAround.getText(), false);
-            previousStatus.put("Up", false);
-            previousStatus.put("Down", true);
-        }
-
-        matchCase.setSelected(previousStatus.get(matchCase.getText()));
-        wrapAround.setSelected(previousStatus.get(wrapAround.getText()));
+        matchCase.setSelected(UserPreferences.getInstance().getBoolean(UserPreferences.Key.MATCH_CASES, UserPreferences.DEFAULT_IS_MATCH_CASES));
+        wrapAround.setSelected(UserPreferences.getInstance().getBoolean(UserPreferences.Key.WRAP_AROUND, UserPreferences.DEFAULT_IS_WRAP_AROUND));
+        searchField.setText(UserPreferences.getInstance().get(UserPreferences.Key.FIND_TEXT, UserPreferences.DEFAULT_FIND_TEXT));
 
         findButton.disableProperty().bind(searchField.textProperty().isEmpty());
         replaceButton.disableProperty().bind(searchField.textProperty().isEmpty());
@@ -49,20 +41,21 @@ public class ReplaceTextDialogController {
             if (!oldValue.equals(newValue)) {
                 isChanged.set(true);
             }
+            UserPreferences.getInstance().set(UserPreferences.Key.FIND_TEXT, newValue);
         });
 
         matchCase.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!(oldValue && newValue)) {
                 isChanged.set(true);
             }
-            previousStatus.replace(matchCase.getText(), newValue);
+            UserPreferences.getInstance().setBoolean(UserPreferences.Key.MATCH_CASES, newValue);
         });
 
         wrapAround.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!(oldValue && newValue)) {
                 isChanged.set(true);
             }
-            previousStatus.replace(wrapAround.getText(), newValue);
+            UserPreferences.getInstance().setBoolean(UserPreferences.Key.WRAP_AROUND, newValue);
         });
 
     }

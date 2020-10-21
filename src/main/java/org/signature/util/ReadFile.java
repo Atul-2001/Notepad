@@ -84,10 +84,8 @@ public class ReadFile extends Task<Void> {
                             Platform.runLater(() -> EndOfLine.set(EOL_Type));
                             writingPad.setCaretPosition(0);
                             updateProgress(workDone, totalWork);
-                            System.gc();
-                            System.runFinalization();
                         } catch (IOException e) {
-                            System.out.println(e.getMessage());
+                            System.out.println("Read Exception : " + e.getLocalizedMessage());
                             failed();
                         }
                     } else {
@@ -114,18 +112,15 @@ public class ReadFile extends Task<Void> {
     @Override
     protected synchronized void succeeded() {
         updateMessage("Done!");
-        super.succeeded();
     }
 
     @Override
     protected synchronized void cancelled() {
         updateMessage("Cancelled!");
-        super.cancelled();
     }
 
     @Override
     protected synchronized void failed() {
         updateMessage("Failed!");
-        super.failed();
     }
 }

@@ -8,11 +8,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.signature.model.Position;
+import org.signature.preferences.UserPreferences;
 import org.signature.util.MatcherResultList;
 import org.signature.util.ResultIterator;
 
 import javax.swing.*;
-import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -33,21 +33,13 @@ public class FindTextDialogController {
 
     private JTextArea writingPad;
     private final AtomicBoolean isChanged = new AtomicBoolean(false);
-    private static Map<String, Boolean> previousStatus;
 
     public void initialize() {
-        previousStatus = TextPadController.getPreviousStatus();
-        if (previousStatus.isEmpty()) {
-            previousStatus.put(matchCase.getText(), false);
-            previousStatus.put(wrapAround.getText(), false);
-            previousStatus.put(upDirection.getText(), false);
-            previousStatus.put(downDirection.getText(), true);
-        }
-
-        matchCase.setSelected(previousStatus.get(matchCase.getText()));
-        wrapAround.setSelected(previousStatus.get(wrapAround.getText()));
-        upDirection.setSelected(previousStatus.get(upDirection.getText()));
-        downDirection.setSelected(previousStatus.get(downDirection.getText()));
+        matchCase.setSelected(UserPreferences.getInstance().getBoolean(UserPreferences.Key.MATCH_CASES, UserPreferences.DEFAULT_IS_MATCH_CASES));
+        wrapAround.setSelected(UserPreferences.getInstance().getBoolean(UserPreferences.Key.WRAP_AROUND, UserPreferences.DEFAULT_IS_WRAP_AROUND));
+        upDirection.setSelected(UserPreferences.getInstance().getBoolean(UserPreferences.Key.UP_DIRECTION, UserPreferences.DEFAULT_IS_UP_DIRECTION));
+        downDirection.setSelected(UserPreferences.getInstance().getBoolean(UserPreferences.Key.DOWN_DIRECTION, UserPreferences.DEFAULT_IS_DOWN_DIRECTION));
+        searchField.setText(UserPreferences.getInstance().get(UserPreferences.Key.FIND_TEXT, UserPreferences.DEFAULT_FIND_TEXT));
 
         findButton.disableProperty().bind(searchField.textProperty().isEmpty());
 
@@ -55,34 +47,35 @@ public class FindTextDialogController {
             if (!oldValue.equals(newValue)) {
                 isChanged.set(true);
             }
+            UserPreferences.getInstance().set(UserPreferences.Key.FIND_TEXT, newValue);
         });
 
         matchCase.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!(oldValue && newValue)) {
                 isChanged.set(true);
             }
-            previousStatus.replace(matchCase.getText(), newValue);
+            UserPreferences.getInstance().setBoolean(UserPreferences.Key.MATCH_CASES, newValue);
         });
 
         wrapAround.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!(oldValue && newValue)) {
                 isChanged.set(true);
             }
-            previousStatus.replace(wrapAround.getText(), newValue);
+            UserPreferences.getInstance().setBoolean(UserPreferences.Key.WRAP_AROUND, newValue);
         });
 
         upDirection.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!(oldValue && newValue)) {
                 isChanged.set(true);
             }
-            previousStatus.replace(upDirection.getText(), newValue);
+            UserPreferences.getInstance().setBoolean(UserPreferences.Key.UP_DIRECTION, newValue);
         });
 
         downDirection.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!(oldValue && newValue)) {
                 isChanged.set(true);
             }
-            previousStatus.replace(downDirection.getText(), newValue);
+            UserPreferences.getInstance().setBoolean(UserPreferences.Key.DOWN_DIRECTION, newValue);
         });
     }
 

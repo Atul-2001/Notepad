@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class WriteFile extends Service<Boolean> {
 
@@ -38,6 +40,13 @@ public class WriteFile extends Service<Boolean> {
                                 updateMessage("Saving file...");
 
                                 String content = writingPad.getText();
+
+                                if (content.startsWith(".LOG")) {
+                                    LocalDateTime dateTime = LocalDateTime.now();
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm  dd-MM-yyyy");
+                                    content += System.lineSeparator() + dateTime.format(formatter) + System.lineSeparator();
+                                }
+
                                 switch (EndOfLine.get()) {
                                     case TextFile.EOLFormat.WINDOW:
                                         content = content.replaceAll("([^\\r][\\n]|[\\r][^\\n])", "\r\n");
@@ -55,7 +64,7 @@ public class WriteFile extends Service<Boolean> {
 //                                Files.write(destination.toPath(), writingPad.getText().getBytes(), StandardOpenOption.WRITE);
                                 return true;
                             } catch (IOException e) {
-                                System.out.println("Exception : " + e.getMessage());
+                                System.out.println("Write Exception : " + e.getLocalizedMessage());
                                 failed();
                             }
                         } else {
@@ -77,19 +86,16 @@ public class WriteFile extends Service<Boolean> {
             @Override
             protected synchronized void succeeded() {
                 updateMessage("Done!");
-                super.succeeded();
             }
 
             @Override
             protected synchronized void cancelled() {
                 updateMessage("Cancelled!");
-                super.cancelled();
             }
 
             @Override
             protected synchronized void failed() {
                 updateMessage("Failed!");
-                super.failed();
             }
         };
     }
