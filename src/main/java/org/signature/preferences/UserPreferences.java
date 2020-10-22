@@ -12,7 +12,7 @@ public final class UserPreferences {
     public static final String DEFAULT_FILE_DIRECTORY = System.getProperty("user.home").concat(File.separator).concat("Documents");
     public static final boolean DEFAULT_WORD_WRAP = false;
     public static final boolean DEFAULT_SHOW_STATUS_BAR = true;
-    public static final String DEFAULT_FONT_FAMILY = "Roboto";
+    public static final String DEFAULT_FONT_FAMILY = "Arial";
     public static final int DEFAULT_FONT_STYLE = Font.PLAIN;
     public static final int DEFAULT_FONT_SIZE = 14;
     public static final String DEFAULT_FIND_TEXT = "";
