@@ -51,6 +51,18 @@ public class App extends Application {
             graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindMadurai-Bold.ttf")));
             graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindGuntur-Regular.ttf")));
             graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/HindGuntur-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-Regular.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-Italic.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-Bold.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-BoldItalic.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-Thin.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-ThinItalic.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-Medium.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-MediumItalic.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-Black.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-BlackItalic.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-Light.ttf")));
+            graphicsEnvironment.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fonts/Roboto-LightItalic.ttf")));
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }

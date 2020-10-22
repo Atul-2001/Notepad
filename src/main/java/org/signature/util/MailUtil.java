@@ -10,7 +10,7 @@ import java.util.Properties;
 
 public class MailUtil {
 
-    private static final String sender_receiver = "***************@gmail.com";
+    private static final String sender_receiver = "********************@gmail.com";
 
     public static boolean sendMail(String user, String content) {
         try {
@@ -19,7 +19,7 @@ public class MailUtil {
             connection.connect();
 
             new Thread(() -> {
-                String password = "**********";
+                String password = "***************";
                 String host = "smtp.gmail.com";
 
                 String subject = "Feedback from " + user;

@@ -338,11 +338,11 @@ public class TextPadController {
                     Alert fileSizeAlert = new Alert(Alert.AlertType.INFORMATION);
                     fileSizeAlert.setTitle("Notepad");
                     fileSizeAlert.setHeaderText(null);
-                    fileSizeAlert.setContentText("File size is too large to open\nin this text editor.");
+                    fileSizeAlert.setContentText("File size is too large to open in this text editor.");
                     fileSizeAlert.showAndWait();
                     return;
                 }
-                
+
                 textFile = new TextFile(source);
                 windowTitle.set(source.getName());
                 isEdited.set(false);
